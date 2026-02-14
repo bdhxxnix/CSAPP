@@ -6,36 +6,62 @@ switch_eg:
 .LFB0:
 	.cfi_startproc
 	endbr64
-	pushq	%rbp
-	.cfi_def_cfa_offset 16
-	.cfi_offset 6, -16
-	movq	%rsp, %rbp
-	.cfi_def_cfa_register 6
-	movq	%rdi, -24(%rbp)
-	movq	%rsi, -32(%rbp)
-	movq	$0, -8(%rbp)
-	movq	-24(%rbp), %rax
-	cmpq	-32(%rbp), %rax
-	setg	%al
-	movzbl	%al, %eax
-	testl	%eax, %eax
-	je	.L2
-	cmpl	$1, %eax
-	jne	.L3
-	movq	-24(%rbp), %rax
-	subq	-32(%rbp), %rax
-	movq	%rax, -8(%rbp)
-	jmp	.L3
-.L2:
-	movq	-32(%rbp), %rax
-	subq	-24(%rbp), %rax
-	movq	%rax, -8(%rbp)
-	nop
-.L3:
-	movq	-8(%rbp), %rax
-	popq	%rbp
-	.cfi_def_cfa 7, 8
+	cmpq	$6, %rdi
+	ja	.L11
+	leaq	.L4(%rip), %rcx
+	movslq	(%rcx,%rdi,4), %rdx
+	addq	%rcx, %rdx
+	notrack jmp	*%rdx
+	.section	.rodata
+	.align 4
+	.align 4
+.L4:
+	.long	.L10-.L4
+	.long	.L9-.L4
+	.long	.L8-.L4
+	.long	.L7-.L4
+	.long	.L6-.L4
+	.long	.L5-.L4
+	.long	.L3-.L4
+	.text
+.L9:
+	movq	%rdi, %rcx
+	subq	%rsi, %rcx
+.L1:
+	movq	%rcx, %rax
 	ret
+.L10:
+	movq	%rsi, %rcx
+	subq	%rdi, %rcx
+	jmp	.L1
+.L8:
+	movq	%rdi, %rcx
+	imulq	%rsi, %rcx
+	jmp	.L1
+.L7:
+	leaq	(%rdi,%rsi), %rcx
+	jmp	.L1
+.L6:
+	addq	$1, %rsi
+	movq	%rdi, %rax
+	cqto
+	idivq	%rsi
+	movq	%rax, %rcx
+	jmp	.L1
+.L5:
+	addq	$1, %rsi
+	movq	%rdi, %rax
+	cqto
+	idivq	%rsi
+	movq	%rdx, %rcx
+	jmp	.L1
+.L3:
+	movq	%rdi, %rcx
+	andq	%rsi, %rcx
+	jmp	.L1
+.L11:
+	movl	$0, %ecx
+	jmp	.L1
 	.cfi_endproc
 .LFE0:
 	.size	switch_eg, .-switch_eg
